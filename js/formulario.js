@@ -9,7 +9,7 @@ emailjs.init("S77wOL6DfGYPNM7N1");
 document.addEventListener("DOMContentLoaded", () => {
 
     // =================================================
-    // OBTENER FORMULARIO
+    // OBTENER FORMULARIOo
     // =================================================
 
     const form = document.querySelector("#contactForm");
