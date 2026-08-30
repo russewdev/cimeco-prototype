@@ -1,6 +1,6 @@
 /* =====================================================
-CIMECO - FORMULARIO
-EmailJS
+   CIMECO - FORMULARIO
+   EmailJS
 ===================================================== */
 
 // Inicializar EmailJS
@@ -8,129 +8,227 @@ emailjs.init("S77wOL6DfGYPNM7N1");
 
 document.addEventListener("DOMContentLoaded", () => {
 
-// Obtener formulario
-const form = document.querySelector("#formulario");
-
-// Verificar que el formulario exista
-if (!form) {
-    console.error("No se encontró el formulario #formulario");
-    return;
-}
-
-// Obtener botón
-const boton = form.querySelector("button[type='submit']");
-
-
-// =================================================
-// EVENTO SUBMIT
-// =================================================
-
-form.addEventListener("submit", async (e) => {
-
-    e.preventDefault();
-
-
     // =================================================
-    // OBTENER DATOS
+    // OBTENER FORMULARIO
     // =================================================
 
-    const datos = {
+    const form = document.querySelector("#contactForm");
 
-        nombre:
-            document.querySelector("#nombre").value,
+    if (!form) {
+        console.error("No se encontró el formulario #contactForm");
+        return;
+    }
 
-        direccion:
-            document.querySelector("#direccion").value,
+    // Botón
+    const boton = form.querySelector("button[type='submit']");
 
-        telefono:
-            document.querySelector("#telefono").value,
-
-        email:
-            document.querySelector("#email").value,
-
-        motivo:
-            document.querySelector(
-                'input[name="motivo"]:checked'
-            )?.value || "No especificado",
-
-        mensaje:
-            document.querySelector("#mensaje").value
-
-    };
-
-
-    // =================================================
-    // BOTÓN - ESTADO ENVIANDO
-    // =================================================
-
-    boton.disabled = true;
-
-    boton.innerHTML = `
-        <span class="spinner-border spinner-border-sm me-2"></span>
-        Enviando...
+    // Texto original
+    const textoOriginal = `
+        <span class="button-text">Enviar consulta</span>
+        <i class="bi bi-send"></i>
     `;
 
 
-    try {
+    // =================================================
+    // SUBMIT
+    // =================================================
 
-        // =================================================
-        // ENVIAR EMAIL
-        // =================================================
+    form.addEventListener("submit", async (e) => {
 
-        const respuesta = await emailjs.send(
-            "service_ziw4ggr",
-            "template_ilojrgu",
-            datos
-        );
-
-
-        // Mostrar respuesta en consola
-        console.log("Email enviado correctamente:", respuesta);
+        e.preventDefault();
 
 
         // =================================================
-        // LIMPIAR FORMULARIO
+        // VALIDACIÓN
         // =================================================
 
-        form.reset();
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
 
 
         // =================================================
-        // ÉXITO
+        // OBTENER DATOS
         // =================================================
 
-        alert("Consulta enviada correctamente ✅");
+        const datos = {
 
+            nombre:
+                document.querySelector("#nombre").value,
 
-    } catch (error) {
+            direccion:
+                document.querySelector("#direccion").value,
+
+            telefono:
+                document.querySelector("#telefono").value,
+
+            email:
+                document.querySelector("#email").value,
+
+            motivo:
+                document.querySelector(
+                    'input[name="motivo"]:checked'
+                )?.value || "No especificado",
+
+            mensaje:
+                document.querySelector("#mensaje").value
+
+        };
+
 
         // =================================================
-        // ERROR
+        // BOTÓN - ESTADO ENVIANDO
         // =================================================
 
-        console.error("Error EmailJS:", error);
+        boton.disabled = true;
 
-        alert(
-            "No se pudo enviar la consulta ❌\n\n" +
-            "Por favor intentá nuevamente."
-        );
-
-
-    } finally {
-
-        // =================================================
-        // RESTAURAR BOTÓN
-        // =================================================
-
-        boton.disabled = false;
+        boton.classList.add("sending");
 
         boton.innerHTML = `
-            Enviar consulta
-            <i class="bi bi-send"></i>
+            <div class="button-progress">
+                <div class="button-progress-bar"></div>
+            </div>
+
+            <span class="button-loading-text">
+                Enviando...
+            </span>
         `;
 
-    }
+        const progressBar =
+            boton.querySelector(".button-progress-bar");
 
-});
+
+        // =================================================
+        // ANIMACIÓN DE PROGRESO
+        // =================================================
+
+        let progreso = 0;
+
+        const intervalo = setInterval(() => {
+
+            // No llegar al 100% hasta que EmailJS confirme
+            if (progreso < 90) {
+
+                progreso += 1;
+
+                progressBar.style.width = `${progreso}%`;
+
+            }
+
+        }, 35);
+
+
+        try {
+
+            // =================================================
+            // ENVIAR EMAIL
+            // =================================================
+
+            const respuesta = await emailjs.send(
+                "service_ziw4ggr",
+                "template_ilojrgu",
+                datos
+            );
+
+
+            console.log(
+                "Email enviado correctamente:",
+                respuesta
+            );
+
+
+            // =================================================
+            // DETENER PROGRESO
+            // =================================================
+
+            clearInterval(intervalo);
+
+
+            // Completar barra
+            progressBar.style.width = "100%";
+
+
+            // Esperar un poquito para que se vea el 100%
+            await new Promise(resolve => {
+                setTimeout(resolve, 450);
+            });
+
+
+            // =================================================
+            // LIMPIAR FORMULARIO
+            // =================================================
+
+            form.reset();
+
+
+            // =================================================
+            // MOSTRAR MODAL DE ÉXITO
+            // =================================================
+
+            const modalElemento =
+                document.querySelector("#modalExito");
+
+            if (modalElemento) {
+
+                const modalExito =
+                    bootstrap.Modal.getOrCreateInstance(
+                        modalElemento
+                    );
+
+                modalExito.show();
+
+            }
+
+
+        } catch (error) {
+
+            // =================================================
+            // ERROR
+            // =================================================
+
+            clearInterval(intervalo);
+
+            console.error(
+                "Error EmailJS:",
+                error
+            );
+
+
+            // Mostrar error dentro del formulario
+            const formMessage =
+                document.querySelector("#formMessage");
+
+            if (formMessage) {
+
+                formMessage.className =
+                    "form-message error text-center mt-3";
+
+                formMessage.innerHTML = `
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    No se pudo enviar la consulta. Intentá nuevamente.
+                `;
+
+            }
+
+        } finally {
+
+            // =================================================
+            // RESTAURAR BOTÓN
+            // =================================================
+
+            setTimeout(() => {
+
+                boton.disabled = false;
+
+                boton.classList.remove("sending");
+
+                boton.innerHTML = textoOriginal;
+
+            }, 600);
+
+        }
+
+    });
 
 });
