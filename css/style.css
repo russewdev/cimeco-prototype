@@ -1054,3 +1054,164 @@ footer p i {
         font-size: 30px;
     }
 }
+
+
+
+/* =====================================================
+   PROGRESO DEL BOTÓN
+===================================================== */
+
+.btn-submit {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-submit.sending {
+    cursor: wait;
+    background: var(--red-dark);
+}
+
+.button-progress {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: 4px;
+
+    background: rgba(255, 255, 255, 0.18);
+
+    overflow: hidden;
+}
+
+.button-progress-bar {
+    width: 0%;
+    height: 100%;
+
+    background: white;
+
+    transition: width .1s linear;
+}
+
+.button-loading-text {
+    position: relative;
+    z-index: 2;
+
+    display: inline-block;
+}
+
+
+/* =====================================================
+   MODAL ÉXITO
+===================================================== */
+
+.success-modal {
+    border: none;
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+.success-modal .modal-body {
+    padding: 50px 35px !important;
+}
+
+
+/* ICONO VERDE */
+
+.success-icon {
+    width: 90px;
+    height: 90px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 25px;
+
+    background: #e8f8ef;
+
+    border-radius: 50%;
+
+    color: #198754;
+
+    font-size: 48px;
+
+    animation: successPop .45s ease;
+}
+
+.success-icon i {
+    font-size: 48px;
+    font-weight: bold;
+}
+
+
+/* TÍTULO */
+
+.success-modal h2 {
+    margin-bottom: 12px;
+
+    font-size: 32px;
+    font-weight: 800;
+
+    color: var(--black);
+}
+
+
+/* TEXTO */
+
+.success-modal p {
+    max-width: 400px;
+
+    margin: 0 auto 28px;
+
+    color: var(--gray);
+
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+
+/* BOTÓN */
+
+.success-button {
+    padding: 12px 30px;
+
+    background: var(--red);
+    color: white;
+
+    border-radius: 9px;
+
+    font-weight: 700;
+
+    transition: .2s;
+}
+
+.success-button:hover {
+    background: var(--red-dark);
+    color: white;
+
+    transform: translateY(-2px);
+}
+
+
+/* =====================================================
+   ANIMACIÓN ICONO
+===================================================== */
+
+@keyframes successPop {
+
+    0% {
+        opacity: 0;
+        transform: scale(.5);
+    }
+
+    70% {
+        transform: scale(1.08);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+}
