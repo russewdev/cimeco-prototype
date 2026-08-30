@@ -6,10 +6,11 @@
 // Inicializar EmailJS
 emailjs.init("S77wOL6DfGYPNM7N1");
 
+
 document.addEventListener("DOMContentLoaded", () => {
 
     // =================================================
-    // OBTENER FORMULARIOo
+    // OBTENER FORMULARIO
     // =================================================
 
     const form = document.querySelector("#contactForm");
@@ -19,12 +20,36 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // Botón
+
+    // =================================================
+    // EVITAR DOBLE INICIALIZACIÓN
+    // =================================================
+
+    if (form.dataset.emailjsInitialized === "true") {
+        return;
+    }
+
+    form.dataset.emailjsInitialized = "true";
+
+
+    // =================================================
+    // OBTENER BOTÓN
+    // =================================================
+
     const boton = form.querySelector("button[type='submit']");
 
-    // Texto original
+    if (!boton) {
+        console.error("No se encontró el botón submit");
+        return;
+    }
+
+
+    // Texto original del botón
     const textoOriginal = `
-        <span class="button-text">Enviar consulta</span>
+        <span class="button-text">
+            Enviar consulta
+        </span>
+
         <i class="bi bi-send"></i>
     `;
 
@@ -39,7 +64,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         // =================================================
-        // VALIDACIÓN
+        // EVITAR DOBLE ENVÍO
+        // =================================================
+
+        if (boton.disabled) {
+            return;
+        }
+
+
+        // =================================================
+        // VALIDAR FORMULARIO
         // =================================================
 
         if (!form.checkValidity()) {
@@ -78,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         // =================================================
-        // BOTÓN - ESTADO ENVIANDO
+        // BOTÓN - ENVIANDO
         // =================================================
 
         boton.disabled = true;
@@ -95,24 +129,25 @@ document.addEventListener("DOMContentLoaded", () => {
             </span>
         `;
 
+
         const progressBar =
             boton.querySelector(".button-progress-bar");
 
 
         // =================================================
-        // ANIMACIÓN DE PROGRESO
+        // PROGRESO VISUAL
         // =================================================
 
         let progreso = 0;
 
         const intervalo = setInterval(() => {
 
-            // No llegar al 100% hasta que EmailJS confirme
             if (progreso < 90) {
 
                 progreso += 1;
 
-                progressBar.style.width = `${progreso}%`;
+                progressBar.style.width =
+                    `${progreso}%`;
 
             }
 
@@ -122,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
 
             // =================================================
-            // ENVIAR EMAIL
+            // ENVIAR CON EMAILJS
             // =================================================
 
             const respuesta = await emailjs.send(
@@ -139,17 +174,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             // =================================================
-            // DETENER PROGRESO
+            // COMPLETAR BARRA
             // =================================================
 
             clearInterval(intervalo);
 
-
-            // Completar barra
             progressBar.style.width = "100%";
 
 
-            // Esperar un poquito para que se vea el 100%
+            // Esperar para mostrar el 100%
             await new Promise(resolve => {
                 setTimeout(resolve, 450);
             });
@@ -159,7 +192,30 @@ document.addEventListener("DOMContentLoaded", () => {
             // LIMPIAR FORMULARIO
             // =================================================
 
-            form.reset();
+            /*
+             * Usamos el método nativo directamente.
+             * Esto evita problemas si algún elemento
+             * está sobrescribiendo "reset".
+             */
+
+            HTMLFormElement.prototype.reset.call(form);
+
+
+            // =================================================
+            // LIMPIAR MENSAJE
+            // =================================================
+
+            const formMessage =
+                document.querySelector("#formMessage");
+
+            if (formMessage) {
+
+                formMessage.innerHTML = "";
+
+                formMessage.className =
+                    "form-message text-center mt-3";
+
+            }
 
 
             // =================================================
@@ -169,6 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const modalElemento =
                 document.querySelector("#modalExito");
 
+
             if (modalElemento) {
 
                 const modalExito =
@@ -177,6 +234,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
                 modalExito.show();
+
+            } else {
+
+                console.error(
+                    "No se encontró el modal #modalExito"
+                );
 
             }
 
@@ -195,9 +258,9 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            // Mostrar error dentro del formulario
             const formMessage =
                 document.querySelector("#formMessage");
+
 
             if (formMessage) {
 
@@ -206,7 +269,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 formMessage.innerHTML = `
                     <i class="bi bi-exclamation-circle-fill"></i>
-                    No se pudo enviar la consulta. Intentá nuevamente.
+                    No se pudo enviar la consulta.
+                    Intentá nuevamente.
                 `;
 
             }
