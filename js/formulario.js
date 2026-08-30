@@ -4,7 +4,6 @@ EmailJS
 ===================================================== */
 
 // Inicializar EmailJS
-
 emailjs.init("S77wOL6DfGYPNM7N1");
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -21,10 +20,15 @@ if (!form) {
 // Obtener botón
 const boton = form.querySelector("button[type='submit']");
 
-// Evento submit
+
+// =================================================
+// EVENTO SUBMIT
+// =================================================
+
 form.addEventListener("submit", async (e) => {
 
     e.preventDefault();
+
 
     // =================================================
     // OBTENER DATOS
@@ -54,6 +58,7 @@ form.addEventListener("submit", async (e) => {
 
     };
 
+
     // =================================================
     // BOTÓN - ESTADO ENVIANDO
     // =================================================
@@ -65,17 +70,30 @@ form.addEventListener("submit", async (e) => {
         Enviando...
     `;
 
+
     try {
 
         // =================================================
         // ENVIAR EMAIL
         // =================================================
 
-        await emailjs.send(
+        const respuesta = await emailjs.send(
             "service_ziw4ggr",
             "template_ilojrgu",
             datos
         );
+
+
+        // Mostrar respuesta en consola
+        console.log("Email enviado correctamente:", respuesta);
+
+
+        // =================================================
+        // LIMPIAR FORMULARIO
+        // =================================================
+
+        form.reset();
+
 
         // =================================================
         // ÉXITO
@@ -83,8 +101,6 @@ form.addEventListener("submit", async (e) => {
 
         alert("Consulta enviada correctamente ✅");
 
-        // Limpiar formulario
-        form.reset();
 
     } catch (error) {
 
@@ -98,6 +114,7 @@ form.addEventListener("submit", async (e) => {
             "No se pudo enviar la consulta ❌\n\n" +
             "Por favor intentá nuevamente."
         );
+
 
     } finally {
 
@@ -115,4 +132,5 @@ form.addEventListener("submit", async (e) => {
     }
 
 });
+
 });
